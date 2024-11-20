@@ -1,75 +1,48 @@
-# Sistem Kontrol LED Multi-Thread dengan FreeRTOS
+# STM32 FreeRTOS LED Control with Shared Data Simulation  
+Proyek ini mendemonstrasikan penggunaan FreeRTOS pada mikrokontroler STM32 untuk mengontrol beberapa LED menggunakan task dan mensimulasikan akses data bersama.  
+## Features  
+- **Task-based LED Control**  
+  - Green LED berkedip dengan delay 500 ms.  
+  - Red LED berkedip dengan delay 100 ms.  
+- **Shared Data Access Simulation**  
+  - Task berbagi flag(`startFlag`) untuk mensimulasikan sumber daya bersama.  
+  - Jika terjadi konflik(akses bersamaan), Blue LED menyala sebagai indikator interferensi.  
+- **FreeRTOS Integration**  
+  - Menunjukan penggunaan multithreading dan penjadwalan task berbasis prioritas.  
+## Components Used  
+- **Hardware**  
+  - STM32 Microcontroller (dikonfigurasi dengan sumber clock HSI).  
+  - Tiga LEDs terhubung ke pin GPIO :  
+    - Green LED: `GPIO_PIN_0`.  
+    - Red LED: `GPIO_PIN_1`.  
+    - Blue LED: `GPIO_PIN_2`.  
+- **Software**  
+  - STM32CubeIDE untuk pengembangan dan debugging.  
+  - FreeRTOS untuk pengelolaan task real-time.  
+## How It Works  
+1. **Task Descriptions**  
+- GreenLEDTask: Mengontrol LED Hijau, menyala-mati setiap 500 ms.
+- RedLEDTask: Mengontrol LED Merah, menyala-mati setiap 100 ms.
+- Kedua task memanggil accessSharedData() untuk mensimulasikan akses sumber daya bersama..  
+2. **Shared Data Handling**  
+- Variabel global startFlag digunakan untuk melacak akses data.
+- Jika sebuah task mencoba mengakses data ketika task lain sedang menggunakannya, LED Biru akan 
+  menyala untuk menunjukkan interferensi.  
+## Usage
+- Jalankan program pada papan STM32 Anda.
+- Amati perilaku LED:
+    - LED Hijau menyala-mati setiap 500 ms.
+    - LED Merah menyala-mati setiap 100 ms.
+    - LED Biru menyala jika terjadi konflik selama akses data bersama
+## Noted 
+- Program ini mendemonstrasikan multithreading dasar. Untuk aplikasi tingkat produksi, 
+  implementasikan mekanisme sinkronisasi seperti mutex atau semaphore untuk mengelola sumber 
+  daya bersama dengan aman.
+- Konfigurasi clock diatur untuk sumber HSI. Sesuaikan jika diperlukan untuk perangkat keras 
+  Anda.
+## Demo
+ 
 
-## Tentang Proyek
-Repository ini mengimplementasikan RTOS pada STM32F103C8T6 dengan tiga task: defaultTask, greenLedTask, dan redLedTask untuk mengontrol LED. Menggunakan CMSIS-OS untuk manajemen task dan STM32 HAL untuk konfigurasi clock serta GPIO, program ini mengelola inisialisasi perangkat keras serta kontrol LED secara periodik melalui masing-masing task.
-
-## Diagram Alur Kerja
-<!-- Tambahkan diagram alur kerja jika diperlukan -->
-
-## Struktur Task
-
-### 1. Default Task
-- **Prioritas:** Normal (`osPriorityNormal`)
-- **Stack Size:** 128 bytes
-- **Fungsi:** Task ini berjalan dalam loop kosong dengan delay minimal, berfungsi sebagai task idle untuk sistem.
-
-### 2. Green LED Task (GreenLEDTask)
-- **Prioritas:** Idle (`osPriorityIdle`)
-- **Stack Size:** 128 bytes
-- **Fungsi:** 
-  - Mengontrol LED hijau dengan pola kedipan spesifik.
-  - Menyalakan indikator task LED hijau.
-  - Mengedipkan LED hijau setiap 0.5 detik.
-  - Mengakses data bersama dan menunjukkan interferensi jika ada konflik akses dengan LED biru.
-
-### 3. Red LED Task (RedLEDTask)
-- **Prioritas:** Normal (`osPriorityNormal`)
-- **Stack Size:** 128 bytes
-- **Fungsi:** 
-  - Mengontrol LED merah(pada video demo saya menggunakan led kuning) dengan pola kedipan yang lebih cepat.
-  - Menyalakan indikator task LED merah.
-  - Mengedipkan LED kuning setiap 0.1 detik.
-  - Mengakses data bersama dan menunjukkan interferensi jika ada konflik akses dengan LED biru.
-
-### Interaksi Antar Task
-- Ketiga task berjalan secara independen tanpa saling mempengaruhi.
-- `RedLEDTask` memiliki prioritas yang lebih tinggi dibandingkan task lainnya.
-- Setiap task memiliki LED indikator terpisah untuk menunjukkan status aktif.
-- `DefaultTask` berjalan di background sebagai idle task.
-
-### Pengelolaan Data Bersama
-Fungsi `accessSharedData` digunakan untuk mengelola akses ke data bersama antara task `GreenLEDTask` dan `RedLEDTask`. 
-
-Jika `startFlag` bernilai `1`, task diperbolehkan mengakses data dan flag diubah menjadi `0`. Jika task lain mencoba mengakses data saat `startFlag` bernilai `0`, LED merah akan menyala sebagai indikasi adanya konflik akses (interferensi). Setelah akses selesai, `startFlag` diatur kembali menjadi `1` dan LED biru dimatikan.
-
-## Konfigurasi Hardware
-- Menggunakan GPIO Port A untuk semua LED.
-- Konfigurasi pin sebagai output push-pull.
-- Tidak menggunakan pull-up/pull-down resistor.
-- Kecepatan clock diatur ke frekuensi rendah untuk efisiensi daya.
-
-## Persyaratan Sistem
-- **Hardware:** STM32 Microcontroller
-- **Software:**
-  - FreeRTOS
-  - STM32CubeIDE atau lingkungan pengembangan serupa
-  - HAL Driver STM32
-
-## Cara Penggunaan
-1. Clone repository ini.
-2. Buka proyek menggunakan STM32CubeIDE.
-3. Build proyek.
-4. Flash ke board STM32.
-5. LED akan mulai berkedip sesuai pola yang telah diprogram.
-
-## Catatan Pengembangan
-- Program menggunakan HSI (High Speed Internal) clock.
-- Tidak menggunakan PLL untuk simplisitas.
-- Menggunakan HAL library untuk abstraksi hardware.
-
-
-
-
-https://github.com/user-attachments/assets/19ef2b5e-cb03-4c06-a7c4-ab76eca92209
+https://github.com/user-attachments/assets/162988e6-ae6e-4bca-9021-3e8d7a89e014
 
 
